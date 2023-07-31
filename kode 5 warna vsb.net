@@ -1,0 +1,57 @@
+Imports System.Drawing
+Imports System.Drawing.Imaging
+Imports System.Xml.Schema
+
+Public Class Form1
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'Ganti nama "p1f.jpg" dengan nama gambar yang telah dimasukan ke dalam proyek
+        Dim imagePath As String = "p1f.jpg"
+
+        'membaca gambar dari lokasi yang telah ditentukan
+        Dim bitmap As New Bitmap(imagePath)
+
+        'ubah gambar jadi 5 warna
+        For y As Integer = 0 To bitmap.Height - 1
+            For x As Integer = 0 To bitmap.Width - 1
+                Dim pixel As Color = bitmap.GetPixel(x, y)
+                Dim newColor As Color = GetClosestColor(pixel)
+                bitmap.SetPixel(x, y, newColor)
+            Next
+        Next
+
+        'Menampilkan gambar yang telah diubah warnanya di picture box
+        PictureBox1.Image = bitmap
+    End Sub
+
+    Private Function GetClosestColor(color As Color) As Color
+        'Daftar 5 warna diinginkan
+        Dim colors() As Color = {
+            Color.Red,
+            Color.Green,
+            Color.Blue,
+            Color.Yellow,
+            Color.Purple}
+
+        Dim minDistance As Double = Double.MaxValue
+        Dim closestColor As Color = Color.Black
+
+        'Cari warna terdekat berdasarkan jarak
+        For Each targetColor As Color In colors
+            Dim rDist As Integer = CInt(color.R) - CInt(targetColor.R)
+            Dim gDist As Integer = CInt(color.G) - CInt(targetColor.G)
+            Dim bDist As Integer = CInt(color.B) - CInt(targetColor.B)
+            Dim distance As Double = Math.Sqrt(rDist * rDist + gDist * gDist + bDist * bDist)
+
+            If distance < minDistance Then
+                minDistance = distance
+                closestColor = targetColor
+            End If
+        Next
+        Return closestColor
+    End Function
+
+    'Fungsi SaveImageToFile untuk menyimpan gambar dengan 5 warna
+    Private Sub SaveImageToFile(bitmap As Bitmap, outputPath As String)
+        bitmap.Save(outputPath, ImageFormat.Png)
+    End Sub
+End Class
